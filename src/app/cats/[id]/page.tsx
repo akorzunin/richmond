@@ -12,25 +12,14 @@ import {
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import getCatYearNote from '@/utils/getCatAgeNote';
-
-interface Cat {
-    id: number;
-    name: string;
-    age: number;
-    weight: number;
-    habits: string[];
-    description: string;
-    image: string;
-    logo: string;
-    gallery: string[];
-}
+import { TyCat } from '@/types';
 
 interface CatPageProps {
     params: { id: string };
 }
 
 const CatPage = ({ params }: CatPageProps) => {
-    const [cat, setCat] = useState<Cat | null>(null);
+    const [cat, setCat] = useState<TyCat | null>(null);
     const [loading, setLoading] = useState(true);
 
     const [likes, setLikes] = useState(0);
@@ -69,7 +58,7 @@ const CatPage = ({ params }: CatPageProps) => {
         <div className="min-h-screen bg-gradient-to-br from-pink-50 to-blue-50 dark:from-default-100 dark:to-default-200 py-4 px-1">
             <div className="max-w-6xl mx-auto">
 
-                <Link href="/gallery">
+                <Link href="/cats">
                     <Button color="primary" variant="shadow" className="mb-4 ml-4">
                         ← Назад к всем пушистикам
                     </Button>
@@ -86,7 +75,7 @@ const CatPage = ({ params }: CatPageProps) => {
                     <div className="flex flex-col p-0 sm:p-8 ml-0 sm:ml-8 gap-2">
 
                         <h1 className="text-3xl font-bold text-primary text-center">{cat.name}</h1>
-                        <div className="flex flex-row gap-4 items-center justify-center">
+                        <div className="flex flex-row flex-wrap gap-4 items-start justify-start">
                             <p>
                                 <Chip color="primary">
                                     <strong>Возраст:</strong>
@@ -103,6 +92,11 @@ const CatPage = ({ params }: CatPageProps) => {
                                 {cat.weight}
                                 {' '}
                                 кг
+                            </Chip>
+                            <Chip color="secondary">
+                                <strong>Порода:</strong>
+                                {' '}
+                                {cat.breed}
                             </Chip>
                         </div>
                         <p className="text-foreground/70 text-center">{cat.description}</p>

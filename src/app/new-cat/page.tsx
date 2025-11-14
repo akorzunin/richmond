@@ -1,10 +1,20 @@
+/* eslint-disable max-len */
+/* eslint-disable no-restricted-syntax */
+
 'use client';
 
 import React, { useState, useRef } from 'react';
-import {
-    Card, CardHeader, CardBody, CardFooter, Button, Image, Input, Textarea,
-} from '@heroui/react';
 import { useRouter } from 'next/navigation';
+import {
+    Card,
+    CardHeader,
+    CardBody,
+    CardFooter,
+    Button,
+    Image,
+    Input,
+    Textarea,
+} from '@heroui/react';
 
 const NewCat = () => {
     const router = useRouter();
@@ -12,6 +22,7 @@ const NewCat = () => {
         name: '',
         age: '',
         weight: '',
+        breed: '',
         habits: '',
         description: '',
     });
@@ -53,8 +64,7 @@ const NewCat = () => {
 
     const handleGalleryPhotosUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         const files = Array.from(e.target.files || []);
-        
-        // Проверяем размер файлов
+
         for (const file of files) {
             if (file.size > 5 * 1024 * 1024) {
                 setError(`Файл ${file.name} слишком большой. Максимальный размер 5MB`);
@@ -68,7 +78,7 @@ const NewCat = () => {
         }));
         setGalleryPhotos((prev) => [...prev, ...newPhotos]);
         setError('');
-        
+
         if (galleryPhotosInputRef.current) {
             galleryPhotosInputRef.current.value = '';
         }
@@ -90,12 +100,25 @@ const NewCat = () => {
         });
     };
 
+    const clearForm = () => {
+        setFormData({
+            name: '',
+            age: '',
+            weight: '',
+            breed: '',
+            habits: '',
+            description: '',
+        });
+        setTitlePhoto(null);
+        setGalleryPhotos([]);
+        setError('');
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
         setError('');
 
-        // Валидация
         if (!formData.name.trim()) {
             setError('Введите имя пушистика');
             setIsLoading(false);
@@ -116,10 +139,8 @@ const NewCat = () => {
             submitData.append('habits', formData.habits);
             submitData.append('description', formData.description);
 
-            // Добавляем главное фото
             submitData.append('titlePhoto', titlePhoto.file);
 
-            // Добавляем фото галереи
             galleryPhotos.forEach((photo) => {
                 submitData.append('galleryPhotos', photo.file);
             });
@@ -133,18 +154,8 @@ const NewCat = () => {
 
             if (result.success) {
                 alert('Пушистик успешно добавлен!');
-                // Очищаем форму
-                setFormData({
-                    name: '',
-                    age: '',
-                    weight: '',
-                    habits: '',
-                    description: '',
-                });
-                setTitlePhoto(null);
-                setGalleryPhotos([]);
-                // Перенаправляем на главную страницу
-                router.push('/');
+                clearForm();
+                router.push('/cats');
                 router.refresh();
             } else {
                 setError(result.error || 'Ошибка при сохранении');
@@ -163,19 +174,6 @@ const NewCat = () => {
 
     const triggerGalleryPhotosInput = () => {
         galleryPhotosInputRef.current?.click();
-    };
-
-    const clearForm = () => {
-        setFormData({
-            name: '',
-            age: '',
-            weight: '',
-            habits: '',
-            description: '',
-        });
-        setTitlePhoto(null);
-        setGalleryPhotos([]);
-        setError('');
     };
 
     return (
@@ -229,6 +227,14 @@ const NewCat = () => {
                                 max="20"
                                 variant="bordered"
                             />
+                            <Input
+                                label="Порода"
+                                name="breed"
+                                value={formData.breed}
+                                onChange={handleInputChange}
+                                placeholder="Например: Британская, Сиамская..."
+                                variant="bordered"
+                            />
                         </div>
 
                         <Textarea
@@ -251,7 +257,6 @@ const NewCat = () => {
                             minRows={2}
                         />
 
-                        {/* Главное фото */}
                         <div className="space-y-4">
                             <div className="flex items-center justify-between">
                                 <label className="text-sm font-medium text-foreground">
@@ -283,7 +288,9 @@ const NewCat = () => {
                                     <div className="relative inline-block">
                                         <Image
                                             src={titlePhoto.preview}
-                                            className="w-64 h-64 object-cover rounded-lg shadow-lg ring-4 ring-primary ring-opacity-50"
+                                            className="object-cover rounded-lg shadow-lg ring-4 ring-primary ring-opacity-50"
+                                            width={300}
+                                            height={300}
                                             alt="Главное фото"
                                         />
                                         <Button
@@ -294,18 +301,24 @@ const NewCat = () => {
                                             onClick={removeTitlePhoto}
                                             type="button"
                                         >
-                                            ×
+                                            <Image
+                                                src="/lapka.svg"
+                                                width={16}
+                                                height={16}
+                                                alt="lapka"
+                                            />
                                         </Button>
                                     </div>
                                 </div>
                             )}
                         </div>
 
-                        {/* Фото галереи */}
                         <div className="space-y-4">
                             <div className="flex items-center justify-between">
                                 <label className="text-sm font-medium text-foreground">
-                                    Фото галереи {galleryPhotos.length > 0 && `(${galleryPhotos.length})`}
+                                    Фото галереи
+                                    {' '}
+                                    {galleryPhotos.length > 0 && `(${galleryPhotos.length})`}
                                 </label>
                                 <Button
                                     color="secondary"
@@ -332,7 +345,9 @@ const NewCat = () => {
                                         <div key={index} className="relative group">
                                             <Image
                                                 src={photo.preview}
-                                                className="w-full h-32 object-cover rounded-lg shadow-md"
+                                                className="object-cover rounded-lg shadow-md"
+                                                width={170}
+                                                height={170}
                                                 alt={`Фото галереи ${index + 1}`}
                                             />
                                             <Button
@@ -343,7 +358,12 @@ const NewCat = () => {
                                                 onClick={() => removeGalleryPhoto(index)}
                                                 type="button"
                                             >
-                                                ×
+                                                <Image
+                                                    src="/lapka.svg"
+                                                    width={16}
+                                                    height={16}
+                                                    alt="lapka"
+                                                />
                                             </Button>
                                         </div>
                                     ))}

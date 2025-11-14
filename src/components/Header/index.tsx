@@ -19,11 +19,12 @@ const Header = () => {
 
     const links = [
         { href: '/', label: 'Пушистик дня' },
-        { href: '/gallery', label: 'Галерея' },
+        { href: '/cats', label: 'Галерея' },
         { href: '/chaos', label: 'Хаос' },
         { href: '/new-cat', label: 'Добавить пушистика' },
-
     ];
+
+    console.log('pathname', pathname)
 
     return (
         <Navbar
@@ -36,7 +37,6 @@ const Header = () => {
                 shadow-sm
             "
         >
-            {/* Левая часть: бренд */}
             <NavbarBrand className="flex items-center gap-3">
                 <Avatar
                     name="Ричик"
@@ -52,25 +52,26 @@ const Header = () => {
                 </Link>
             </NavbarBrand>
 
-            {/* Центр: навигация */}
             <NavbarContent className="hidden sm:flex gap-6" justify="center">
-                {links.map(({ href, label }) => (
-                    <NavbarItem key={href} isActive={pathname === href}>
-                        <Link
-                            href={href}
-                            className={`relative transition-all duration-300 after:absolute after:left-0 after:-bottom-1 after:h-[2px] after:w-full after:scale-x-0 after:origin-left after:bg-primary after:transition-transform after:duration-300 hover:after:scale-x-100 ${
-                                pathname === href
-                                    ? 'text-primary font-semibold after:scale-x-100'
-                                    : 'text-foreground hover:text-primary/80'
-                            }`}
-                        >
-                            {label}
-                        </Link>
-                    </NavbarItem>
-                ))}
+                {links.map(({ href, label }) => {
+                    const isActiveLink = pathname === href || (href !== '/' && pathname.startsWith(href));
+                    return (
+                        <NavbarItem key={href} isActive={isActiveLink}>
+                            <Link
+                                href={href}
+                                className={`relative transition-all duration-300 after:absolute after:left-0 after:-bottom-1 after:h-[2px] after:w-full after:scale-x-0 after:origin-left after:bg-primary after:transition-transform after:duration-300 hover:after:scale-x-100 ${
+                                    isActiveLink
+                                        ? 'text-primary font-semibold after:scale-x-100'
+                                        : 'text-foreground hover:text-primary/80'
+                                }`}
+                            >
+                                {label}
+                            </Link>
+                        </NavbarItem>
+                    );
+                })}
             </NavbarContent>
 
-            {/* Правая часть: кнопки */}
             <NavbarContent justify="end" className="gap-3">
                 <NavbarItem className="hidden lg:flex">
                     <Link
@@ -85,7 +86,7 @@ const Header = () => {
                     <Button
                         as={Link}
                         color="primary"
-                        href="/gallery"
+                        href="/cats"
                         variant="shadow"
                         className="w-[130px] font-medium text-white shadow-md hover:shadow-lg transition-shadow"
                     >

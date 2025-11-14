@@ -4,29 +4,18 @@
 
 import React, { useState, useEffect } from 'react';
 import {
-    Card, CardHeader, Image, Button, Chip,
+    Card, Image, Button, Chip,
 } from '@heroui/react';
 import Link from 'next/link';
 import getCatYearNote from '@/utils/getCatAgeNote';
-
-interface Cat {
-    id: number;
-    name: string;
-    age: number;
-    weight: number;
-    habits: string[];
-    description: string;
-    logo?: string;
-    image?: string;
-    gallery: string[] | number[];
-}
+import { TyCat } from '@/types';
 
 interface CatsData {
-    cats: Cat[];
+    cats: TyCat[];
 }
 
 const Gallery = () => {
-    const [cats, setCats] = useState<Cat[]>([]);
+    const [cats, setCats] = useState<TyCat[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
@@ -117,7 +106,7 @@ const Gallery = () => {
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {cats.map((cat) => (
-                            <Link key={cat.id} href={`/cat/${cat.id}`}>
+                            <Link key={cat.id} href={`/cats/${cat.id}`}>
                                 <Card className="flex flex-row w-full p-2 shadow-lg rounded-2xl bg-white/70 dark:bg-default-50 backdrop-blur-md border border-default-200 dark:border-default-100 hover:shadow-xl transition-all duration-300 hover:scale-105 cursor-pointer">
                                     <Image
                                         src={cat.logo || cat.image || '/default-cat.jpg'}
@@ -129,7 +118,7 @@ const Gallery = () => {
                                     <div className="flex flex-col gap-4 ml-4">
 
                                         <h2 className="text-xl font-bold text-primary">{cat.name}</h2>
-                                        <div className="flex gap-2 text-xs text-foreground/60">
+                                        <div className="flex flex-wrap gap-2 text-xs text-foreground/60">
                                             <Chip color="primary">
                                                 {cat.age}
                                                 {' '}
@@ -139,6 +128,9 @@ const Gallery = () => {
                                                 {cat.weight}
                                                 {' '}
                                                 кг
+                                            </Chip>
+                                            <Chip color="secondary">
+                                                {cat.breed}
                                             </Chip>
                                         </div>
                                         <p className="text-foreground/70 text-sm">{cat.description}</p>
