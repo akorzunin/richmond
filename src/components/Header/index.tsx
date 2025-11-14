@@ -44,9 +44,12 @@ const Header = () => {
                     size="md"
                     className="shadow-md hover:scale-105 transition-transform"
                 />
-                <p className="font-bold text-inherit text-lg tracking-wide">
+                <Link
+                    href="/"
+                    className="font-bold text-inherit text-lg tracking-wide"
+                >
                     Пушистик дня 🐾
-                </p>
+                </Link>
             </NavbarBrand>
 
             {/* Центр: навигация */}
@@ -82,11 +85,11 @@ const Header = () => {
                     <Button
                         as={Link}
                         color="primary"
-                        href="#"
+                        href="/gallery"
                         variant="shadow"
                         className="w-[130px] font-medium text-white shadow-md hover:shadow-lg transition-shadow"
                     >
-                        Регистрация
+                        Галерея
                     </Button>
                 </NavbarItem>
             </NavbarContent>

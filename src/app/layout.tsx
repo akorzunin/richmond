@@ -31,7 +31,7 @@ const RootLayout = ({
             <Providers>
                 <Header />
                 <main
-                    className="flex-1 max-w-[1280px] w-full mx-auto px-4 py-8"
+                    className="flex-1 max-w-[1280px] w-full mx-auto px-0 sx:px-4 lg:px-0 py-0"
                     style={{ minHeight: 'calc(100vh - 150px)' }}
                 >
                     {children}

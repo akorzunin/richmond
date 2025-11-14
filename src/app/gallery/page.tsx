@@ -3,8 +3,11 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Card, CardHeader, Image, Button } from '@heroui/react';
+import {
+    Card, CardHeader, Image, Button, Chip,
+} from '@heroui/react';
 import Link from 'next/link';
+import getCatYearNote from '@/utils/getCatAgeNote';
 
 interface Cat {
     id: number;
@@ -32,11 +35,11 @@ const Gallery = () => {
             try {
                 setIsLoading(true);
                 const response = await fetch('/api/cats');
-                
+
                 if (!response.ok) {
                     throw new Error('Failed to fetch cats');
                 }
-                
+
                 const data: CatsData = await response.json();
                 setCats(data.cats || []);
             } catch (err) {
@@ -55,7 +58,7 @@ const Gallery = () => {
             <div className="min-h-screen bg-gradient-to-br from-pink-50 to-blue-50 dark:from-default-100 dark:to-default-200 py-8 px-4">
                 <div className="max-w-6xl mx-auto text-center">
                     <div className="flex justify-center items-center py-12">
-                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary" />
                     </div>
                     <p className="text-foreground/70">Загружаем пушистиков...</p>
                 </div>
@@ -70,9 +73,9 @@ const Gallery = () => {
                     <div className="bg-danger-50 border border-danger-200 text-danger-700 px-6 py-4 rounded-lg mb-4">
                         {error}
                     </div>
-                    <Button 
-                        color="primary" 
-                        variant="shadow" 
+                    <Button
+                        color="primary"
+                        variant="shadow"
                         onClick={() => window.location.reload()}
                     >
                         Попробовать снова
@@ -92,7 +95,7 @@ const Gallery = () => {
                     <p className="text-foreground/70 text-lg">
                         Выберите котика, чтобы увидеть его галерею и узнать больше
                     </p>
-                    
+
                     <Link href="/new-cat">
                         <Button color="success" variant="shadow" className="mt-4">
                             + Добавить нового пушистика
@@ -115,23 +118,31 @@ const Gallery = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {cats.map((cat) => (
                             <Link key={cat.id} href={`/cat/${cat.id}`}>
-                                <Card className="w-full shadow-lg rounded-2xl bg-white/70 dark:bg-default-50 backdrop-blur-md border border-default-200 dark:border-default-100 hover:shadow-xl transition-all duration-300 hover:scale-105 cursor-pointer">
-                                    <CardHeader className="flex flex-col items-center gap-3 p-4">
-                                        <Image
-                                            src={cat.logo || cat.image || '/default-cat.jpg'}
-                                            className="shadow-md rounded-xl object-cover w-48 h-48"
-                                            width={200}
-                                            height={200}
-                                            alt={cat.name}
-                                        />
+                                <Card className="flex flex-row w-full p-2 shadow-lg rounded-2xl bg-white/70 dark:bg-default-50 backdrop-blur-md border border-default-200 dark:border-default-100 hover:shadow-xl transition-all duration-300 hover:scale-105 cursor-pointer">
+                                    <Image
+                                        src={cat.logo || cat.image || '/default-cat.jpg'}
+                                        className="shadow-md rounded-xl object-cover w-48 h-48"
+                                        width={200}
+                                        height={200}
+                                        alt={cat.name}
+                                    />
+                                    <div className="flex flex-col gap-4 ml-4">
+
                                         <h2 className="text-xl font-bold text-primary">{cat.name}</h2>
-                                        <p className="text-foreground/70 text-center text-sm">{cat.description}</p>
                                         <div className="flex gap-2 text-xs text-foreground/60">
-                                            <span>{cat.age} {cat.age === 1 ? 'год' : cat.age < 5 ? 'года' : 'лет'}</span>
-                                            <span>•</span>
-                                            <span>{cat.weight} кг</span>
+                                            <Chip color="primary">
+                                                {cat.age}
+                                                {' '}
+                                                {getCatYearNote(cat.age)}
+                                            </Chip>
+                                            <Chip color="success">
+                                                {cat.weight}
+                                                {' '}
+                                                кг
+                                            </Chip>
                                         </div>
-                                    </CardHeader>
+                                        <p className="text-foreground/70 text-sm">{cat.description}</p>
+                                    </div>
                                 </Card>
                             </Link>
                         ))}
