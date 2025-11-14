@@ -4,8 +4,10 @@ import React, { useState, useRef } from 'react';
 import {
     Card, CardHeader, CardBody, CardFooter, Button, Image, Input, Textarea,
 } from '@heroui/react';
+import { useRouter } from 'next/navigation';
 
 const NewCat = () => {
+    const router = useRouter();
     const [formData, setFormData] = useState({
         name: '',
         age: '',
@@ -13,29 +15,74 @@ const NewCat = () => {
         habits: '',
         description: '',
     });
-    const [photos, setPhotos] = useState([]);
+    const [titlePhoto, setTitlePhoto] = useState<{ file: File; preview: string } | null>(null);
+    const [galleryPhotos, setGalleryPhotos] = useState<Array<{ file: File; preview: string }>>([]);
     const [isLoading, setIsLoading] = useState(false);
-    const fileInputRef = useRef(null);
+    const [error, setError] = useState('');
+    const titlePhotoInputRef = useRef<HTMLInputElement>(null);
+    const galleryPhotosInputRef = useRef<HTMLInputElement>(null);
 
-    const handleInputChange = (e) => {
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
         setFormData((prev) => ({
             ...prev,
             [name]: value,
         }));
+        setError('');
     };
 
-    const handlePhotoUpload = (e) => {
-        const files = Array.from(e.target.files);
+    const handleTitlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        if (file.size > 5 * 1024 * 1024) {
+            setError('Файл слишком большой. Максимальный размер 5MB');
+            return;
+        }
+
+        setTitlePhoto({
+            file,
+            preview: URL.createObjectURL(file),
+        });
+        setError('');
+
+        if (titlePhotoInputRef.current) {
+            titlePhotoInputRef.current.value = '';
+        }
+    };
+
+    const handleGalleryPhotosUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const files = Array.from(e.target.files || []);
+        
+        // Проверяем размер файлов
+        for (const file of files) {
+            if (file.size > 5 * 1024 * 1024) {
+                setError(`Файл ${file.name} слишком большой. Максимальный размер 5MB`);
+                return;
+            }
+        }
+
         const newPhotos = files.map((file) => ({
             file,
             preview: URL.createObjectURL(file),
         }));
-        setPhotos((prev) => [...prev, ...newPhotos]);
+        setGalleryPhotos((prev) => [...prev, ...newPhotos]);
+        setError('');
+        
+        if (galleryPhotosInputRef.current) {
+            galleryPhotosInputRef.current.value = '';
+        }
     };
 
-    const removePhoto = (index) => {
-        setPhotos((prev) => {
+    const removeTitlePhoto = () => {
+        if (titlePhoto) {
+            URL.revokeObjectURL(titlePhoto.preview);
+            setTitlePhoto(null);
+        }
+    };
+
+    const removeGalleryPhoto = (index: number) => {
+        setGalleryPhotos((prev) => {
             const newPhotos = [...prev];
             URL.revokeObjectURL(newPhotos[index].preview);
             newPhotos.splice(index, 1);
@@ -43,21 +90,38 @@ const NewCat = () => {
         });
     };
 
-    const handleSubmit = async (e) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
+        setError('');
+
+        // Валидация
+        if (!formData.name.trim()) {
+            setError('Введите имя пушистика');
+            setIsLoading(false);
+            return;
+        }
+
+        if (!titlePhoto) {
+            setError('Добавьте главное фото');
+            setIsLoading(false);
+            return;
+        }
 
         try {
             const submitData = new FormData();
-            submitData.append('name', formData.name);
+            submitData.append('name', formData.name.trim());
             submitData.append('age', formData.age);
             submitData.append('weight', formData.weight);
             submitData.append('habits', formData.habits);
             submitData.append('description', formData.description);
 
-            // Добавляем файлы
-            photos.forEach((photo) => {
-                submitData.append('photos', photo.file);
+            // Добавляем главное фото
+            submitData.append('titlePhoto', titlePhoto.file);
+
+            // Добавляем фото галереи
+            galleryPhotos.forEach((photo) => {
+                submitData.append('galleryPhotos', photo.file);
             });
 
             const response = await fetch('/api/cats', {
@@ -77,19 +141,41 @@ const NewCat = () => {
                     habits: '',
                     description: '',
                 });
-                setPhotos([]);
+                setTitlePhoto(null);
+                setGalleryPhotos([]);
+                // Перенаправляем на главную страницу
+                router.push('/');
+                router.refresh();
             } else {
-                alert(`Ошибка при сохранении: ${result.error}`);
+                setError(result.error || 'Ошибка при сохранении');
             }
         } catch (error) {
-            alert('Ошибка при отправке формы');
+            console.error('Submit error:', error);
+            setError('Ошибка при отправке формы');
         } finally {
             setIsLoading(false);
         }
     };
 
-    const triggerFileInput = () => {
-        fileInputRef.current?.click();
+    const triggerTitlePhotoInput = () => {
+        titlePhotoInputRef.current?.click();
+    };
+
+    const triggerGalleryPhotosInput = () => {
+        galleryPhotosInputRef.current?.click();
+    };
+
+    const clearForm = () => {
+        setFormData({
+            name: '',
+            age: '',
+            weight: '',
+            habits: '',
+            description: '',
+        });
+        setTitlePhoto(null);
+        setGalleryPhotos([]);
+        setError('');
     };
 
     return (
@@ -97,14 +183,20 @@ const NewCat = () => {
             <Card className="max-w-2xl w-full shadow-xl rounded-2xl bg-white/70 dark:bg-default-50 backdrop-blur-md border border-default-200 dark:border-default-100">
                 <CardHeader className="flex flex-col items-center gap-2 py-6">
                     <div className="flex items-center gap-3">
-                        <Image src="/lapka.svg" width={16} height={16} />
+                        <Image src="/lapka.svg" width={16} height={16} alt="Лапка" />
                         <h1 className="text-3xl font-bold text-primary">Добавить нового пушистика</h1>
-                        <Image src="/lapka.svg" width={16} height={16} />
+                        <Image src="/lapka.svg" width={16} height={16} alt="Лапка" />
                     </div>
                     <p className="text-foreground/70 text-center">Заполните информацию о вашем любимце</p>
                 </CardHeader>
 
                 <CardBody>
+                    {error && (
+                        <div className="bg-danger-50 border border-danger-200 text-danger-700 px-4 py-3 rounded-lg mb-4">
+                            {error}
+                        </div>
+                    )}
+
                     <form onSubmit={handleSubmit} className="flex flex-col gap-6">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <Input
@@ -114,6 +206,7 @@ const NewCat = () => {
                                 onChange={handleInputChange}
                                 required
                                 variant="bordered"
+                                isInvalid={!!error && !formData.name.trim()}
                             />
                             <Input
                                 label="Возраст (лет)"
@@ -158,83 +251,130 @@ const NewCat = () => {
                             minRows={2}
                         />
 
+                        {/* Главное фото */}
                         <div className="space-y-4">
                             <div className="flex items-center justify-between">
-                                <label className="text-sm font-medium text-foreground">Фотографии</label>
+                                <label className="text-sm font-medium text-foreground">
+                                    Главное фото *
+                                </label>
                                 <Button
                                     color="primary"
                                     variant="flat"
                                     size="sm"
-                                    onClick={triggerFileInput}
+                                    onClick={triggerTitlePhotoInput}
+                                    type="button"
                                 >
-                                    📷 Добавить фото
+                                    🏷️ Выбрать главное фото
                                 </Button>
                                 <input
-                                    ref={fileInputRef}
+                                    ref={titlePhotoInputRef}
                                     type="file"
-                                    multiple
                                     accept="image/*"
-                                    onChange={handlePhotoUpload}
+                                    onChange={handleTitlePhotoUpload}
                                     className="hidden"
                                 />
                             </div>
 
-                            {photos.length > 0 && (
-                                <div className="flex gap-8 flex-wrap mt-8">
-                                    {photos.map((photo, index) => (
-                                        <div key={index} className="relative group size-fit">
+                            {titlePhoto && (
+                                <div className="relative group">
+                                    <div className="text-sm text-foreground/70 mb-2">
+                                        Это фото будет отображаться на главной странице
+                                    </div>
+                                    <div className="relative inline-block">
+                                        <Image
+                                            src={titlePhoto.preview}
+                                            className="w-64 h-64 object-cover rounded-lg shadow-lg ring-4 ring-primary ring-opacity-50"
+                                            alt="Главное фото"
+                                        />
+                                        <Button
+                                            color="danger"
+                                            size="sm"
+                                            isIconOnly
+                                            className="absolute -top-2 -right-2 z-10"
+                                            onClick={removeTitlePhoto}
+                                            type="button"
+                                        >
+                                            ×
+                                        </Button>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Фото галереи */}
+                        <div className="space-y-4">
+                            <div className="flex items-center justify-between">
+                                <label className="text-sm font-medium text-foreground">
+                                    Фото галереи {galleryPhotos.length > 0 && `(${galleryPhotos.length})`}
+                                </label>
+                                <Button
+                                    color="secondary"
+                                    variant="flat"
+                                    size="sm"
+                                    onClick={triggerGalleryPhotosInput}
+                                    type="button"
+                                >
+                                    📷 Добавить фото в галерею
+                                </Button>
+                                <input
+                                    ref={galleryPhotosInputRef}
+                                    type="file"
+                                    multiple
+                                    accept="image/*"
+                                    onChange={handleGalleryPhotosUpload}
+                                    className="hidden"
+                                />
+                            </div>
+
+                            {galleryPhotos.length > 0 && (
+                                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                                    {galleryPhotos.map((photo, index) => (
+                                        <div key={index} className="relative group">
                                             <Image
                                                 src={photo.preview}
-                                                className="w-32 h-32 object-cover rounded-lg shadow-md"
-                                                alt={`Preview ${index + 1}`}
+                                                className="w-full h-32 object-cover rounded-lg shadow-md"
+                                                alt={`Фото галереи ${index + 1}`}
                                             />
                                             <Button
                                                 color="danger"
                                                 size="sm"
                                                 isIconOnly
-                                                className="absolute -top-4 z-10 -right-4"
-                                                onClick={() => removePhoto(index)}
+                                                className="absolute -top-2 -right-2 z-10"
+                                                onClick={() => removeGalleryPhoto(index)}
+                                                type="button"
                                             >
-                                                <Image src="/lapka.svg" width={16} height={16} />
+                                                ×
                                             </Button>
                                         </div>
                                     ))}
                                 </div>
                             )}
                         </div>
+
+                        <CardFooter className="flex justify-center gap-4 px-0 pb-0 pt-6">
+                            <Button
+                                color="primary"
+                                variant="shadow"
+                                size="lg"
+                                type="submit"
+                                className="min-w-32"
+                                startContent={!isLoading && <Image src="/lapka.svg" width={16} height={16} alt="Лапка" />}
+                                isLoading={isLoading}
+                            >
+                                {isLoading ? 'Сохранение...' : 'Сохранить'}
+                            </Button>
+                            <Button
+                                color="default"
+                                variant="flat"
+                                size="lg"
+                                onClick={clearForm}
+                                type="button"
+                            >
+                                Очистить
+                            </Button>
+                        </CardFooter>
                     </form>
                 </CardBody>
-
-                <CardFooter className="flex justify-center gap-4 py-6">
-                    <Button
-                        color="primary"
-                        variant="shadow"
-                        size="lg"
-                        onClick={handleSubmit}
-                        className="min-w-32"
-                        startContent={<Image src="/lapka.svg" width={16} height={16} />}
-                        isLoading={isLoading}
-                    >
-                        {isLoading ? 'Сохранение...' : 'Сохранить'}
-                    </Button>
-                    <Button
-                        color="default"
-                        variant="flat"
-                        size="lg"
-                        onClick={() => {
-                            setFormData({
-                                name: '',
-                                age: '',
-                                weight: '',
-                                habits: '',
-                                description: '',
-                            });
-                            setPhotos([]);
-                        }}
-                    >
-                        Очистить
-                    </Button>
-                </CardFooter>
             </Card>
         </div>
     );

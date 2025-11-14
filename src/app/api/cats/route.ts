@@ -1,3 +1,5 @@
+/* eslint-disable no-restricted-syntax */
+/* eslint-disable no-await-in-loop */
 import { promises as fs } from 'fs';
 import path from 'path';
 import sharp from 'sharp';
@@ -16,7 +18,7 @@ interface CatsData {
     cats: Cat[];
 }
 
-const dataFilePath = path.join(process.cwd(), 'data', 'cats.json');
+const dataFilePath = path.join(process.cwd(), 'src', 'state', 'cats.json');
 const uploadsDir = path.join(process.cwd(), 'public', 'uploads');
 
 const ensureDirectories = async (): Promise<void> => {
@@ -34,10 +36,15 @@ export async function POST(request: Request): Promise<Response> {
         const weight = formData.get('weight') as string;
         const habits = formData.get('habits') as string;
         const description = formData.get('description') as string;
-        const photos = formData.getAll('photos') as File[];
+        const titlePhoto = formData.get('titlePhoto') as File;
+        const galleryPhotos = formData.getAll('galleryPhotos') as File[];
 
-        if (!name || photos.length === 0) {
-            return Response.json({ success: false, error: 'Имя и фото обязательны' });
+        if (!name || !name.trim()) {
+            return Response.json({ success: false, error: 'Имя обязательно' });
+        }
+
+        if (!titlePhoto) {
+            return Response.json({ success: false, error: 'Главное фото обязательно' });
         }
 
         let jsonData: CatsData;
@@ -48,20 +55,16 @@ export async function POST(request: Request): Promise<Response> {
             jsonData = { cats: [] };
         }
 
-        const galleryPaths: string[] = [];
+        const newId = jsonData.cats.length > 0
+            ? Math.max(...jsonData.cats.map((cat) => cat.id)) + 1
+            : 1;
 
-        // eslint-disable-next-line no-restricted-syntax
-        for (const photo of photos) {
-            if (photo.size > 5 * 1024 * 1024) {
-                return Response.json({ success: false, error: 'Файл слишком большой' });
-            }
-
-            // eslint-disable-next-line no-await-in-loop
-            const buffer = await photo.arrayBuffer();
-            const filename = `${Date.now()}-${Math.random().toString(36).substring(7)}.jpg`;
+        let logoPath = '';
+        if (titlePhoto) {
+            const buffer = await titlePhoto.arrayBuffer();
+            const filename = `logo-${newId}-${Math.random().toString(36).substring(2, 9)}.jpg`;
             const filepath = path.join(uploadsDir, filename);
 
-            // eslint-disable-next-line no-await-in-loop
             await sharp(Buffer.from(buffer))
                 .resize(1200, 1200, {
                     fit: 'inside',
@@ -70,16 +73,38 @@ export async function POST(request: Request): Promise<Response> {
                 .jpeg({ quality: 80 })
                 .toFile(filepath);
 
-            galleryPaths.push(`/uploads/${filename}`);
+            logoPath = `/uploads/${filename}`;
+        }
+
+        const galleryPaths: string[] = [];
+        for (const photo of galleryPhotos) {
+            try {
+                const buffer = await photo.arrayBuffer();
+                const filename = `${newId}-${galleryPhotos.indexOf(photo)}.jpg`;
+                const filepath = path.join(uploadsDir, filename);
+
+                await sharp(Buffer.from(buffer))
+                    .resize(1200, 1200, {
+                        fit: 'inside',
+                        withoutEnlargement: true,
+                    })
+                    .jpeg({ quality: 80 })
+                    .toFile(filepath);
+
+                galleryPaths.push(`/uploads/${filename}`);
+            } catch (error) {
+                console.error('Error processing gallery image:', error);
+            }
         }
 
         const newCat: Cat = {
-            id: Date.now(),
-            name,
+            id: newId,
+            name: name.trim(),
             age: parseInt(age) || 0,
             weight: parseFloat(weight) || 0,
             habits: habits ? habits.split(',').map((h) => h.trim()).filter((h) => h) : [],
-            description: description || '',
+            description: (description || '').trim(),
+            logo: logoPath,
             gallery: galleryPaths,
         };
 
@@ -89,7 +114,7 @@ export async function POST(request: Request): Promise<Response> {
         return Response.json({ success: true, cat: newCat });
     } catch (error) {
         console.error('Error saving cat:', error);
-        return Response.json({ success: false, error: 'Server error' });
+        return Response.json({ success: false, error: 'Ошибка сервера' });
     }
 }
 
@@ -97,8 +122,10 @@ export async function GET(): Promise<Response> {
     try {
         await ensureDirectories();
         const data = await fs.readFile(dataFilePath, 'utf8');
-        return Response.json(JSON.parse(data));
+        const jsonData = JSON.parse(data);
+        return Response.json(jsonData);
     } catch (error) {
+        console.error('Error reading cats data:', error);
         return Response.json({ cats: [] });
     }
 }
