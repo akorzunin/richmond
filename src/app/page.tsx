@@ -35,7 +35,7 @@ const HomePage = () => {
                 </CardHeader>
 
                 <CardBody className="flex flex-col gap-2 mt-2">
-                    <div className="flex flex-col flex-wrap gap-4 mb-4 items-start justify-start">
+                    <div className="flex flex-row flex-wrap gap-4 mb-4 items-start justify-start">
                         <Chip color="primary">
                             <strong>Возраст:</strong>
                             {' '}
