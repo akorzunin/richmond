@@ -5,9 +5,6 @@
 import React, { useEffect, useState } from 'react';
 import {
     Card,
-    CardHeader,
-    CardBody,
-    CardFooter,
     Button,
     Image,
     Chip,
@@ -24,7 +21,8 @@ interface Cat {
     habits: string[];
     description: string;
     image: string;
-    gallery: number[];
+    logo: string;
+    gallery: string[];
 }
 
 interface CatPageProps {

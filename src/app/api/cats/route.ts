@@ -11,6 +11,7 @@ interface Cat {
     weight: number;
     habits: string[];
     description: string;
+    logo: string;
     gallery: string[];
 }
 
