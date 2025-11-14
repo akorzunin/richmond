@@ -123,13 +123,10 @@ export default [{
             unnamedComponents: "arrow-function",
         }],
 
-        "max-len": ["error", {
-            code: 150,
-            tabWidth: 4,
-        }],
-
+        "max-len": "off",
         "react/jsx-props-no-spreading": "off",
         "no-continue": "off",
+        "no-restricted-syntax": "off",
         "no-promise-executor-return": "off",
         "react/require-default-props": "off",
         "no-shadow": "off",

@@ -1,5 +1,3 @@
-/* eslint-disable max-len */
-
 'use client';
 
 import React, { useEffect, useState } from 'react';
@@ -76,16 +74,14 @@ const CatPage = ({ params }: CatPageProps) => {
 
                         <h1 className="text-3xl font-bold text-primary text-center">{cat.name}</h1>
                         <div className="flex flex-row flex-wrap gap-4 items-start justify-start">
-                            <p>
-                                <Chip color="primary">
-                                    <strong>Возраст:</strong>
+                            <Chip color="primary">
+                                <strong>Возраст:</strong>
 
-                                    {' '}
-                                    {cat.age}
-                                    {' '}
-                                    {getCatYearNote(cat.age)}
-                                </Chip>
-                            </p>
+                                {' '}
+                                {cat.age}
+                                {' '}
+                                {getCatYearNote(cat.age)}
+                            </Chip>
                             <Chip color="success">
                                 <strong>Вес:</strong>
                                 {' '}

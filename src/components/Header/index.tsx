@@ -1,5 +1,3 @@
-/* eslint-disable max-len */
-
 'use client';
 
 import React from 'react';
@@ -23,8 +21,6 @@ const Header = () => {
         { href: '/chaos', label: 'Хаос' },
         { href: '/new-cat', label: 'Добавить пушистика' },
     ];
-
-    console.log('pathname', pathname)
 
     return (
         <Navbar

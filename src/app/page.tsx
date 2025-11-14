@@ -3,7 +3,9 @@
 import React, { useState } from 'react';
 import {
     Card, CardHeader, CardBody, CardFooter, Button, Image,
+    Chip,
 } from '@heroui/react';
+import getCatYearNote from '@/utils/getCatAgeNote';
 
 const catOfTheDay = {
     name: 'Ричик',
@@ -12,6 +14,7 @@ const catOfTheDay = {
     habits: ['Кусать за ноги', 'Ловить лучики солнца', 'Мурчать по утрам', 'Есть вкусняшки'],
     description: 'Ричик любит уютные места и всегда встречает всех мурлыканьем.',
     image: '/rich.jpg',
+    breed: 'Серый-полосатый',
 };
 
 const HomePage = () => {
@@ -32,20 +35,27 @@ const HomePage = () => {
                 </CardHeader>
 
                 <CardBody className="flex flex-col gap-2 mt-2">
-                    <p>
-                        <strong>Возраст:</strong>
-                        {' '}
-                        {catOfTheDay.age}
-                        {' '}
-                        {catOfTheDay.age === 1 ? 'год' : 'года'}
-                    </p>
-                    <p>
-                        <strong>Вес:</strong>
-                        {' '}
-                        {catOfTheDay.weight}
-                        {' '}
-                        кг
-                    </p>
+                    <div className="flex flex-col flex-wrap gap-4 mb-4 items-start justify-start">
+                        <Chip color="primary">
+                            <strong>Возраст:</strong>
+                            {' '}
+                            {catOfTheDay.age}
+                            {' '}
+                            {getCatYearNote(catOfTheDay.age)}
+                        </Chip>
+                        <Chip color="success">
+                            <strong>Вес:</strong>
+                            {' '}
+                            {catOfTheDay.weight}
+                            {' '}
+                            кг
+                        </Chip>
+                        <Chip color="secondary">
+                            <strong>Порода:</strong>
+                            {' '}
+                            {catOfTheDay.breed}
+                        </Chip>
+                    </div>
                     <p><strong>Любимые привычки:</strong></p>
                     <ul className="list-disc list-inside">
                         {catOfTheDay.habits.map((habit, i) => (
