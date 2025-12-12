@@ -27,8 +27,8 @@ const Gallery = () => {
                     throw new Error('Failed to fetch cats');
                 }
 
-                const data: CatsData = await response.json();
-                setCats(data.cats || []);
+                const cats: TyCat[] = await response.json();
+                setCats(cats);
             } catch (err) {
                 console.error('Error fetching cats:', err);
                 setError('Не удалось загрузить пушистиков');
@@ -76,8 +76,8 @@ const Gallery = () => {
         <div className="min-h-screen bg-gradient-to-br from-pink-50 to-blue-50 dark:from-default-100 dark:to-default-200 py-8 px-4">
             <div className="max-w-6xl mx-auto">
                 <div className="text-center mb-8">
-                    <h1 className="text-4xl font-bold text-primary mb-2">
-                        Наши Пушистики 🐱
+                    <h1 className="text-3xl font-bold text-primary mb-2">
+                        Наши Пушистики&nbsp;🐱
                     </h1>
                     <p className="text-foreground/70 text-lg">
                         Выберите котика, чтобы увидеть его галерею и узнать больше
@@ -107,7 +107,8 @@ const Gallery = () => {
                             <Link key={cat.id} href={`/cats/${cat.id}`}>
                                 <Card className="flex flex-row w-full p-2 shadow-lg rounded-2xl bg-white/70 dark:bg-default-50 backdrop-blur-md border border-default-200 dark:border-default-100 hover:shadow-xl transition-all duration-300 hover:scale-105 cursor-pointer">
                                     <Image
-                                        src={cat.logo || cat.image || '/default-cat.jpg'}
+                                        // @ts-expect-error
+                                        src={cat.logo || cat.logo_path || '/default-cat.jpg'}
                                         className="shadow-md rounded-xl object-cover w-48 h-48"
                                         width={200}
                                         height={200}

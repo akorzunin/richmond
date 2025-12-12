@@ -147,6 +147,39 @@
         "/uploads/4-0.jpg",
         "/uploads/4-1.jpg"
       ]
+    },
+    {
+      "id": 5,
+      "name": "Бубка!",
+      "age": 10,
+      "weight": 5,
+      "breed": "Толстая",
+      "habits": [
+        "Да"
+      ],
+      "description": "Кошечка!",
+      "logo": "/uploads/logo-5-4dokhe7.jpg",
+      "gallery": [
+        "/uploads/5-0.jpg",
+        "/uploads/5-1.jpg",
+        "/uploads/5-2.jpg",
+        "/uploads/5-3.jpg",
+        "/uploads/5-4.jpg",
+        "/uploads/5-5.jpg",
+        "/uploads/5-6.jpg",
+        "/uploads/5-7.jpg",
+        "/uploads/5-8.jpg",
+        "/uploads/5-9.jpg",
+        "/uploads/5-10.jpg",
+        "/uploads/5-11.jpg",
+        "/uploads/5-12.jpg",
+        "/uploads/5-13.jpg",
+        "/uploads/5-14.jpg",
+        "/uploads/5-15.jpg",
+        "/uploads/5-16.jpg",
+        "/uploads/5-17.jpg",
+        "/uploads/5-18.jpg"
+      ]
     }
   ]
 }

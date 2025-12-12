@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, use } from 'react';
 import {
     Card,
     Button,
@@ -17,6 +17,7 @@ interface CatPageProps {
 }
 
 const CatPage = ({ params }: CatPageProps) => {
+    const { id } = use(params);
     const [cat, setCat] = useState<TyCat | null>(null);
     const [loading, setLoading] = useState(true);
 
@@ -25,7 +26,7 @@ const CatPage = ({ params }: CatPageProps) => {
 
     useEffect(() => {
         const fetchCat = async () => {
-            const res = await fetch(`/api/cats/${params.id}`);
+            const res = await fetch(`/api/cats/${id}`);
 
             if (!res.ok) {
                 notFound();
@@ -38,7 +39,7 @@ const CatPage = ({ params }: CatPageProps) => {
         };
 
         fetchCat();
-    }, [params.id]);
+    }, [id]);
 
     if (loading) {
         return (
@@ -52,6 +53,8 @@ const CatPage = ({ params }: CatPageProps) => {
         notFound();
     }
 
+    console.log('cat', cat);
+
     return (
         <div className="min-h-screen bg-gradient-to-br from-pink-50 to-blue-50 dark:from-default-100 dark:to-default-200 py-4 px-1">
             <div className="max-w-6xl mx-auto">
@@ -64,10 +67,9 @@ const CatPage = ({ params }: CatPageProps) => {
 
                 <Card className="flex flex-col sm:flex-row gap-4 items-center p-4 mb-8 shadow-xl rounded-2xl bg-white/70 dark:bg-default-50 backdrop-blur-md border border-default-200 dark:border-default-100">
                     <Image
-                        src={cat.logo}
+                        src={cat.logo_path}
                         className="shadow-lg rounded-xl object-cover w-[100%]"
                         height={400}
-                        // width={400}
                         alt={cat.name}
                     />
                     <div className="flex flex-col p-0 sm:p-8 ml-0 sm:ml-8 gap-2">

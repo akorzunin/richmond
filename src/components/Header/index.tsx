@@ -1,3 +1,5 @@
+/* eslint-disable jsx-a11y/anchor-is-valid */
+
 'use client';
 
 import React from 'react';
@@ -84,7 +86,7 @@ const Header = () => {
                         color="primary"
                         href="/cats"
                         variant="shadow"
-                        className="w-[130px] font-medium text-white shadow-md hover:shadow-lg transition-shadow"
+                        className="w-fit font-medium shadow-md hover:shadow-lg transition-shadow"
                     >
                         Галерея
                     </Button>

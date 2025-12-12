@@ -133,6 +133,7 @@ const NewCat = () => {
             submitData.append('name', formData.name.trim());
             submitData.append('age', formData.age);
             submitData.append('weight', formData.weight);
+            submitData.append('breed', formData.breed);
             submitData.append('habits', formData.habits);
             submitData.append('description', formData.description);
 

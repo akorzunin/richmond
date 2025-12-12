@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     Card, CardHeader, CardBody, CardFooter, Button, Image,
     Chip,
@@ -20,6 +20,16 @@ const catOfTheDay = {
 const HomePage = () => {
     const [likes, setLikes] = useState(0);
     const [dislikes, setDislikes] = useState(0);
+
+    const fetchCats = async () => {
+        const res = await fetch('/api/cats');
+        const data = await res.json();
+        console.log('cats', data);
+    };
+
+    useEffect(() => {
+        fetchCats();
+    }, []);
 
     return (
         <div className="flex justify-center mt-8 px-4">
