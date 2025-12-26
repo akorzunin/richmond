@@ -238,7 +238,7 @@ const QuizPage = () => {
     const handleAnswerSelect = (value: string) => {
         if (isAnswered) return;
 
-        const answerIndex = parseInt(value);
+        const answerIndex = parseInt(value, 10);
         // setSelectedAnswer(answerIndex);
         setSelectedAnswer(null);
         setIsAnswered(true);
@@ -610,6 +610,20 @@ const QuizPage = () => {
                                         className="px-8 py-6 text-lg rounded-2xl"
                                     >
                                         Следующий вопрос →
+                                    </Button>
+                                </div>
+                            )}
+
+                            {currentQuestion === quizQuestions.length - 1 && (
+                                <div className="flex justify-center mt-6">
+                                    <Button
+                                        color="primary"
+                                        variant="shadow"
+                                        size="lg"
+                                        onClick={completeQuiz}
+                                        className="px-8 py-6 text-lg rounded-2xl"
+                                    >
+                                        Посмотреть результат
                                     </Button>
                                 </div>
                             )}
