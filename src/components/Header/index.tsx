@@ -20,8 +20,9 @@ const Header = () => {
     const links = [
         { href: '/', label: 'Пушистик дня' },
         { href: '/cats', label: 'Галерея' },
-        { href: '/chaos', label: 'Хаос' },
         { href: '/facts', label: 'Факты' },
+        { href: '/quiz', label: 'Викторина' },
+        { href: '/generator', label: 'Придумать имя' },
         { href: '/new-cat', label: 'Добавить пушистика' },
     ];
 
