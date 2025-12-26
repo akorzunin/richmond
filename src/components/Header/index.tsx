@@ -23,6 +23,7 @@ const Header = () => {
         { href: '/facts', label: 'Факты' },
         { href: '/quiz', label: 'Викторина' },
         { href: '/generator', label: 'Придумать имя' },
+        { href: '/calendar', label: 'Календарь' },
         { href: '/new-cat', label: 'Добавить пушистика' },
     ];
 
