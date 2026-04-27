@@ -162,7 +162,7 @@ const NewCat = () => {
                 file: files,
             });
             if (result.catId) {
-                alert('Пушистик успешно добавлен!');
+                console.info('New cat created', result);
                 clearForm();
                 router.push('/cats');
                 router.refresh();

@@ -8,9 +8,10 @@ on [http://localhost:3000](http://localhost:3000)
 
 ## API Client Configuration
 
-Set the API URL in `.env.local`:
+Set the API URL in `.env.local` or `cp .env.local.example .env.local`:
 ```
 NEXT_PUBLIC_API_URL=http://localhost:8080
+NEXT_PUBLIC_BASE_S3_URL=http://localhost:9900
 ```
 
 ## API Client Generation
